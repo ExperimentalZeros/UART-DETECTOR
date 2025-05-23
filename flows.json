@@ -1,0 +1,219 @@
+[
+    {
+        "id": "15b0281f7e327857",
+        "type": "inject",
+        "z": "56eb661eab65ed6a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 580,
+        "wires": [
+            [
+                "19a53be973a5a0f6"
+            ]
+        ]
+    },
+    {
+        "id": "19a53be973a5a0f6",
+        "type": "function",
+        "z": "56eb661eab65ed6a",
+        "name": "/dev/serial/by-id",
+        "func": "msg.payload = \"/dev/serial/by-id\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 580,
+        "wires": [
+            [
+                "8974cf44a5b16e3f"
+            ]
+        ]
+    },
+    {
+        "id": "8974cf44a5b16e3f",
+        "type": "exec",
+        "z": "56eb661eab65ed6a",
+        "command": "ls",
+        "addpay": "payload",
+        "append": "-l",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 470,
+        "y": 580,
+        "wires": [
+            [
+                "a391bdb73c4552f3"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2ed7450c621f2203",
+        "type": "debug",
+        "z": "56eb661eab65ed6a",
+        "name": "GM",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "a391bdb73c4552f3",
+        "type": "function",
+        "z": "56eb661eab65ed6a",
+        "name": "SERIAL PORT ASSIGMENTS",
+        "func": "let GM;\nlet GPS;\nlet BY_ID = msg.payload.split(\"\\n\");\n\nlet X = { \"port\": BY_ID[1].substring(BY_ID[1].length - 7), \"device\": BY_ID[1].split(\" \")[8] };\nlet Y = { \"port\": BY_ID[2].substring(BY_ID[2].length - 7), \"device\": BY_ID[2].split(\" \")[8] };\n\nif ( X[\"device\"] == \"usb-Raspberry_Pi_Pico_E6614C30939C602B-if00\"){\n    GM  = X[\"port\"];\n    GPS = Y[\"port\"]; \n}\nelse{\n    GM  = Y[\"port\"];\n    GPS = X[\"port\"];\n}\n\nmsg = [\n    { \"payload\":{\n    \"serialport\": \"/dev/\" + GM,\n    \"serialbaud\": 9600,\n    \"databits\": 8,\n    \"parity\": \"none\",\n    \"stopbits\": 1,\n    \"enabled\": true\n    }, \"topic\": \"GM\"},\n    \n    { \"payload\":{\n    \"serialport\": \"/dev/\" + GPS,\n    \"serialbaud\": 115200,\n    \"databits\": 8,\n    \"parity\": \"none\",\n    \"stopbits\": 1,\n    \"enabled\": true\n    }, \"topic\": \"GPS\"},\n]\n\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 520,
+        "wires": [
+            [
+                "306eb872a6159f26"
+            ],
+            [
+                "dcc8cb08c39f7df6"
+            ]
+        ]
+    },
+    {
+        "id": "88f3481870167945",
+        "type": "debug",
+        "z": "56eb661eab65ed6a",
+        "name": "GPS",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "306eb872a6159f26",
+        "type": "serial control",
+        "z": "56eb661eab65ed6a",
+        "name": "",
+        "serial": "6644fcac1f647851",
+        "x": 670,
+        "y": 480,
+        "wires": [
+            [
+                "2ed7450c621f2203",
+                "507745640d5937ef"
+            ]
+        ]
+    },
+    {
+        "id": "dcc8cb08c39f7df6",
+        "type": "serial control",
+        "z": "56eb661eab65ed6a",
+        "name": "",
+        "serial": "a42fe829cc866a34",
+        "x": 670,
+        "y": 560,
+        "wires": [
+            [
+                "88f3481870167945"
+            ]
+        ]
+    },
+    {
+        "id": "507745640d5937ef",
+        "type": "function",
+        "z": "56eb661eab65ed6a",
+        "name": "CG10",
+        "func": "msg.payload = msg.payload.serialport;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 440,
+        "wires": [
+            [
+                "85f84f4c6475aacc"
+            ]
+        ]
+    },
+    {
+        "id": "6644fcac1f647851",
+        "type": "serial-port",
+        "name": "GM",
+        "serialport": "/dev/ttyACM0",
+        "serialbaud": "9600",
+        "databits": 8,
+        "parity": "none",
+        "stopbits": 1,
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": "100"
+    },
+    {
+        "id": "a42fe829cc866a34",
+        "type": "serial-port",
+        "name": "GPS",
+        "serialport": "/dev/ttyACM1",
+        "serialbaud": "115200",
+        "databits": 8,
+        "parity": "none",
+        "stopbits": 1,
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": 10000
+    }
+]
